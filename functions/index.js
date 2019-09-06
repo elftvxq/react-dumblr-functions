@@ -62,7 +62,7 @@ app.post('/scream', (req, res) => {
         })
 }); 
 
-<<<<<<< HEAD
+
 exports.createScreams = functions.https.onRequest((req, res) => {
     const newScream = {
         body: req.body.body,
@@ -82,7 +82,6 @@ exports.createScreams = functions.https.onRequest((req, res) => {
         console.error(err);
     });
 }); 
-=======
 
 // Signup route
 app.post('/signup', (req, res) => {
@@ -133,4 +132,3 @@ app.post('/signup', (req, res) => {
 });
 
 exports.api = functions.https.onRequest(app);
->>>>>>> 28806d0f82a7cba41ff7e174dfa390e1f831d634
