@@ -177,7 +177,8 @@ exports.unlikeScream = (req, res) =>{
         if(data.empty){
             return res.status(400).json({ error: 'Scream not liked'});
         } else {
-            return db.doc(`/likes/${data.docs[0].data().id}`).delete()
+            return db.doc(`/likes/${data.docs[0].data().id}`)
+            .delete()
             .then(() =>{
                 screamData.likeCount--;
                 return screamDocument.update({ likeCount: screamData.likeCount});
