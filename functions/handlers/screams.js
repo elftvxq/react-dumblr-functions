@@ -9,13 +9,18 @@ exports.getAllScreams = (req, res) => {
             let screams = [];
             data.forEach((doc) => {
                 screams.push({
+                    type: doc.data().type,
                     screamId: doc.id,
+                    title: doc.data().title,
                     body: doc.data().body,
                     userHandle: doc.data().userHandle,
                     createdAt: doc.data().createdAt,
                     commentCount: doc.data().commentCount,
                     likeCount: doc.data().likeCount,
-                    userImage: doc.data().userImage
+                    userImage: doc.data().userImage,
+                    pictureUrl: doc.data().pictureUrl,
+                    tags: doc.data().tags,
+                    linkUrl: doc.data().linkUrl
                 })
             });
             return res.json(screams);
@@ -32,12 +37,17 @@ exports.postOneScream = (req, res) => {
   }
 
   const newScream = {
+    type: req.body.type,
     body: req.body.body,
+    title: req.body.title,
     userHandle: req.user.handle,
     userImage: req.user.imageUrl,
     createdAt: new Date().toISOString(),
     likeCount: 0,
-    commentCount: 0
+    commentCount: 0,
+    tags: req.body.tags,
+    pictureUrl: req.body.pictureUrl,
+    linkUrl: req.body.linkUrl
   };
 
   db.collection('screams')
@@ -222,3 +232,4 @@ exports.deleteScream = (req, res) =>{
         return res.status(500).json({ error: err.code });
     });
 };
+

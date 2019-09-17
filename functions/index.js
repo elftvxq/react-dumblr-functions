@@ -20,7 +20,8 @@ const {
     addUserDetails,
     getAuthenticatedUser,
     getUserDetails,
-    markNotificationsRead
+    markNotificationsRead,
+    uploadCoverImage
 } = require('./handlers/users');
 
 
@@ -43,6 +44,7 @@ app.post('/user', FBAuth, addUserDetails);
 app.get('/user', FBAuth, getAuthenticatedUser);
 app.get('/user/:handle', getUserDetails);
 app.post('/notifications', FBAuth, markNotificationsRead);
+app.post('/user/coverimage', FBAuth, uploadCoverImage);
 
 
 exports.api = functions.https.onRequest(app);

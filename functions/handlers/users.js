@@ -19,6 +19,7 @@ exports.signup = (req, res) => {
    if (!valid) {return res.status(400).json(errors)};
 
     const noImg = 'no-image.png';
+    const defaultCover = 'default-cover.jpg'
 
     // TODO: validate data
     let token, userId;
@@ -44,7 +45,8 @@ exports.signup = (req, res) => {
               email: newUser.email,
               createdAt: new Date().toISOString(),
               imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`,
-              userId
+              userId,
+              coverimageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${defaultCover}?alt=media`
           };
           return db.doc(`/users/${newUser.handle}`).set(userCredentials);
       })
@@ -130,7 +132,11 @@ exports.getUserDetails = (req, res) => {
                 userImage: doc.data().userImage,
                 likeCount: doc.data().likeCount,
                 commentCount: doc.data().commentCount,
-                screamId: doc.id
+                screamId: doc.id,
+                pictureUrl: doc.data().pictureUrl,
+                tags: doc.data().tags,
+                linkUrl: doc.data().linkUrl,
+                title: doc.data().title
             })
         });
         return res.json(userData);
@@ -203,7 +209,7 @@ exports.uploadImage = (req, res) => {
     let imageToBeUploaded = {};
 
     busboy.on('file', (fieldname, file, filename, encoding, minetype) =>{
-        if (minetype !== 'image/jpeg' && minetype !== 'image/png' && minetype !== image/gif) {
+        if (minetype !== 'image/jpeg' && minetype !== 'image/png' && minetype !== 'image/gif') {
             return res.status(400).json({ error: 'Wrong file type submitted' });
         }
         //my.image.png
@@ -252,6 +258,54 @@ exports.markNotificationsRead = (req, res) =>{
         console.error(err);
         return res.status(500).json({ error: err.code });
     })
-}
+};
+
+//upload a cover photo for user
+exports.uploadCoverImage = (req, res) => {
+    const BusBoy = require('busboy');
+    const path = require('path');
+    const os = require('os');
+    const fs = require('fs');
+
+    const busboy = new BusBoy({ headers: req.headers});
+
+    let coverimageFileName;
+    let imageToBeUploaded = {};
+
+    busboy.on('file', (fieldname, file, filename, encoding, minetype) =>{
+        if (minetype !== 'image/jpeg' && minetype !== 'image/png' && minetype !== 'image/gif') {
+            return res.status(400).json({ error: 'Wrong file type submitted' });
+        }
+        //my.image.png
+        const imageExtensions = filename.split('.')[filename.split('.').length - 1];
+        coverimageFileName = `${Math.round(Math.random()*1000000000)}.${imageExtensions}`;
+        //27349821734.png
+        const filepath = path.join(os.tmpdir(), coverimageFileName);
+        imageToBeUploaded = { filepath, minetype };
+        file.pipe(fs.createWriteStream(filepath));
+    });
+    busboy.on('finish', () => {
+        admin.storage().bucket().upload(imageToBeUploaded.filepath, {
+            resumable: false,
+            metadata: {
+                metadata: {
+                    contentType: imageToBeUploaded.minetype
+                }
+            }
+        })
+        .then(() => {
+            const coverimageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${coverimageFileName}?alt=media`;
+            return db.doc(`/users/${req.user.handle}`).update({ coverimageUrl: coverimageUrl});
+        })
+        .then(() =>{
+            return res.json({ message: "Cover image uploaded successfully"}); 
+        })
+        .catch((err) =>{
+            console.error(err);
+            return res.status(500).json({ error: err.code})
+        });
+    });
+    busboy.end(req.rawBody);
+};
 
 
