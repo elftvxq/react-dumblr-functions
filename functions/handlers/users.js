@@ -136,7 +136,8 @@ exports.getUserDetails = (req, res) => {
                 pictureUrl: doc.data().pictureUrl,
                 tags: doc.data().tags,
                 linkUrl: doc.data().linkUrl,
-                title: doc.data().title
+                title: doc.data().title,
+                type: doc.data().type
             })
         });
         return res.json(userData);
