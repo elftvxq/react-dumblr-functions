@@ -30,5 +30,5 @@ Tumblr clone - A social networking platform where users can post various types o
 * Firebase Realtime Database
 
 ## Database Schema
-
+![database scheama](https://upload.cc/i1/2019/10/15/5bE9wC.png)
 
