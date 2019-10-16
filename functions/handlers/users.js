@@ -209,13 +209,18 @@ exports.uploadImage = (req, res) => {
     let imageFileName;
     let imageToBeUploaded = {};
 
+    let userName = req.user.handle;
+    let userNamestr = String(userName);
+
+
     busboy.on('file', (fieldname, file, filename, encoding, minetype) =>{
         if (minetype !== 'image/jpeg' && minetype !== 'image/png' && minetype !== 'image/gif') {
             return res.status(400).json({ error: 'Wrong file type submitted' });
         }
         //my.image.png
         const imageExtensions = filename.split('.')[filename.split('.').length - 1];
-        imageFileName = `${Math.round(Math.random()*1000000000)}.${imageExtensions}`;
+        // imageFileName = `${Math.round(Math.random()*1000000000)}.${imageExtensions}`;
+        imageFileName = userNamestr + '-profile-pic';
         //27349821734.png
         const filepath = path.join(os.tmpdir(), imageFileName);
         imageToBeUploaded = { filepath, minetype };
